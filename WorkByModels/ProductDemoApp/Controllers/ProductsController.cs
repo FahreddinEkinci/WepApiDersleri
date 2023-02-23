@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using ProductDemoApp.Data;
 using ProductDemoApp.Models;
@@ -17,6 +18,7 @@ namespace ProductDemoApp.Controllers
         public ProductsController(ILogger<ProductsController> logger)
         {
             _logger = logger;
+            // logger has been added
         }
 
 
@@ -84,6 +86,19 @@ namespace ProductDemoApp.Controllers
             return StatusCode(200); // retun hass been created :D  200
 
 
+
+        }
+        [HttpPatch("{id:int}")]
+        public IActionResult UpdateImg([FromRoute(Name ="id")]int id,
+            [FromBody] JsonPatchDocument<Product> productPatch)
+        {
+            //check entity
+            var entity = AppDbContext.Products.Find(p => p.Id.Equals(id));
+            if (entity is null)
+                return NotFound();
+
+            productPatch.ApplyTo(entity);
+            return NoContent(); // return 204
 
         }
     }
